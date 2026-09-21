@@ -1,10 +1,10 @@
 Week 2 – Query Performance
 
-Scenario
+## Scenario
 
 the equipment lending database from week 1 has gotten bigger and some queries are running slower. for this assignment i looked at why then made some changes (indexes, better filtering, only grabbing columns i need) to speed things up. also compared csv vs parquet in duckdb.
 
-Files
+## Files
 
 - `week2_schema.sql` – creates the tables
 - `week2_data.sql` – loads sample data (30 students, 15 items, 180 loans)
@@ -15,22 +15,22 @@ Files
 - `week2_notes.txt` – query plan results + what i noticed
 - `data/loan.csv`, `data/loan.parquet` – exported data for the duckdb part
 
-Baseline Queries
+## Baseline Queries
 
 1. all loans with student/item names and dates
 2. loans for one student (`WHERE StudentID = 7`)
 3. everything currently checked out (`WHERE Status = 'checked_out'`)
 
-Indexes
+## Indexes
 
 - `idx_loan_studentid` – for looking up a student's loans
 - `idx_loan_status` – for pulling everything checked out
 - `idx_loan_checkoutdate` – for date range stuff later on
 
- Baseline vs Optimized
+## Baseline vs Optimized
 
 before indexes, `EXPLAIN QUERY PLAN` showed `SCAN Loan` — meaning it checks every row. after adding indexes, it switched to `SEARCH Loan USING INDEX ...`, so it can jump right to the rows it needs. also cut `SELECT *` down to just the columns i actually use. the table's small so the speed difference isn't dramatic, but the scan vs search part is the main takeaway — scans get slower as the table grows, searches stay fast.
 
- DuckDB: CSV vs Parquet
+## DuckDB: CSV vs Parquet
 
 exported the loan data to csv, ran a group by query, converted it to parquet, ran the same query again. same results both times, just different order. parquet's faster because it's columnar — since the query only needed one column, duckdb didn't have to read through the rest.
