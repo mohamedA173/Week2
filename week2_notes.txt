@@ -1,0 +1,2 @@
+`--SCAN Loan
+QUERY PLAN
